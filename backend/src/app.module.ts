@@ -7,7 +7,7 @@ import { ReservationsModule } from './reservations/reservations.module';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'frontend', 'dist'),
-      exclude: ['/api/(.*)'],
+      exclude: ['/api', '/api/:path*'],
     }),
     ReservationsModule,
   ],
