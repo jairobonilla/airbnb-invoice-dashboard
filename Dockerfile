@@ -15,6 +15,7 @@ COPY prisma.config.ts ./
 RUN npm ci
 COPY backend/ ./backend/
 COPY prisma/ ./prisma/
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 RUN npx prisma generate --config prisma.config.ts
 RUN npm run build
 
