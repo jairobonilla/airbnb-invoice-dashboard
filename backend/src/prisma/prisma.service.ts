@@ -9,9 +9,11 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
+    const connectionString = process.env.DATABASE_URL!;
+    const isSocketConnection = connectionString.includes('/cloudsql/');
     const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL!,
-      ssl: { rejectUnauthorized: false },
+      connectionString,
+      ...(isSocketConnection ? {} : { ssl: { rejectUnauthorized: false } }),
     });
 
     super({ adapter });
