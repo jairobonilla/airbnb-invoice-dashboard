@@ -38,6 +38,16 @@ export interface Reservation {
   status: ReservationStatus;
   createdAt: string;
   updatedAt: string;
+  auditLogs?: AuditLog[];
+}
+
+export interface AuditLog {
+  id: string;
+  action: string;
+  oldValue: unknown;
+  newValue: unknown;
+  metadata: unknown;
+  createdAt: string;
 }
 
 export interface DashboardStats {
