@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "ES2021",
+      "outDir": "dist",
+      "rootDir": "backend/src",
+      "strict": true,
+      "strictPropertyInitialization": false,
+      "types": ["node"],
+      "esModuleInterop": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "skipLibCheck": true
+    },
+    "include": ["backend/src/**/*.ts"]
+  }

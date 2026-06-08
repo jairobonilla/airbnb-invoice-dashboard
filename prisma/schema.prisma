@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppUser {
+  id        String     @id @default(uuid())
+  googleSub String     @unique @map("google_sub")
+  email     String     @unique
+  name      String?
+  status    UserStatus @default(ACTIVE)
+
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  invoicedReservations Reservation[] @relation("ReservationInvoicedBy")
+  auditLogs            AuditLog[]
+
+  @@map("app_users")
+}
+
+model Reservation {
+  id String @id @default(uuid())
+
+  // Datos importados
+  externalReservationId String            @map("external_reservation_id")
+  platform              Platform          @default(AIRBNB)
+  source                ReservationSource @default(API)
+
+  propertyName    String? @map("property_name")
+  hostName        String? @map("host_name")
+  guestNameAirbnb String? @map("guest_name_airbnb")
+  guestCount      Int?    @map("guest_count")
+
+  checkInDate  DateTime @map("check_in_date")
+  checkOutDate DateTime @map("check_out_date")
+
+  currency       String   @default("USD")
+  expectedAmount Decimal? @map("expected_amount") @db.Decimal(12, 2)
+
+  // Datos completados manualmente
+  airbnbInvoiceNumber String?  @map("airbnb_invoice_number")
+  confirmedAmount     Decimal? @map("confirmed_amount") @db.Decimal(12, 2)
+
+  requiresElectronicInvoice Boolean @default(false) @map("requires_electronic_invoice")
+
+  customerName      String?    @map("customer_name")
+  customerEmail     String?    @map("customer_email")
+  customerTaxId     String?    @map("customer_tax_id")
+  customerTaxIdType TaxIdType? @map("customer_tax_id_type")
+
+  // Resultado de facturación
+  invoiceStatus          InvoiceStatus @default(NOT_INVOICED) @map("invoice_status")
+  generatedInvoiceNumber String?       @map("generated_invoice_number")
+  invoiceReceiptNumber   String?       @map("invoice_receipt_number")
+  invoicePdfUrl          String?       @map("invoice_pdf_url")
+  invoiceXmlUrl          String?       @map("invoice_xml_url")
+  invoiceErrorMessage    String?       @map("invoice_error_message")
+  invoicedAt             DateTime?     @map("invoiced_at")
+
+  invoicedByAppUserId String?  @map("invoiced_by_app_user_id")
+  invoicedBy          AppUser? @relation("ReservationInvoicedBy", fields: [invoicedByAppUserId], references: [id])
+
+  // Control
+  status    ReservationStatus @default(IMPORTED)
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  auditLogs AuditLog[]
+
+  @@unique([externalReservationId, platform])
+  @@index([status])
+  @@index([invoiceStatus])
+  @@index([checkOutDate])
+  @@index([airbnbInvoiceNumber])
+  @@map("reservations")
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  appUserId String?  @map("app_user_id")
+  appUser   AppUser? @relation(fields: [appUserId], references: [id])
+
+  reservationId String?      @map("reservation_id")
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+
+  action   AuditAction
+  oldValue Json?       @map("old_value")
+  newValue Json?       @map("new_value")
+  metadata Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([reservationId])
+  @@index([appUserId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum Platform {
+  AIRBNB
+}
+
+enum ReservationSource {
+  API
+  EMAIL
+  ICAL
+  MANUAL
+}
+
+enum ReservationStatus {
+  IMPORTED
+  READY_TO_COMPLETE
+  READY_TO_INVOICE
+  INVOICED
+  INVOICE_ERROR
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  NOT_INVOICED
+  READY
+  PROCESSING
+  INVOICED
+  ERROR
+}
+
+enum TaxIdType {
+  FISICA
+  JURIDICA
+  DIMEX
+  NITE
+  PASSPORT
+}
+
+enum AuditAction {
+  RESERVATION_IMPORTED
+  MISSING_DATA_UPDATED
+  READY_TO_INVOICE
+  INVOICE_REQUESTED
+  INVOICE_SUCCESS
+  INVOICE_ERROR
+  RESERVATION_CANCELLED
+}
