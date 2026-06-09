@@ -10,7 +10,12 @@
     </div>
 
     <div v-else class="stats-grid">
-      <div v-for="card in statCards" :key="card.label" class="stat-card">
+      <div
+        v-for="card in statCards"
+        :key="card.label"
+        class="stat-card stat-card--clickable"
+        @click="router.push({ path: '/reservations', query: { status: card.status } })"
+      >
         <div class="stat-icon" :style="{ background: card.bg }">
           <i :class="`pi ${card.icon}`" style="font-size: 1.4rem; color: white;" />
         </div>
@@ -25,10 +30,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ProgressSpinner from 'primevue/progressspinner'
 import { reservationsService } from '../services/reservations'
 import type { DashboardStats } from '../types/reservation'
 
+const router = useRouter()
 const loading = ref(true)
 const stats = ref<DashboardStats | null>(null)
 
@@ -46,24 +53,28 @@ const statCards = computed(() => [
     value: stats.value?.pendingCompletion ?? 0,
     icon: 'pi-clock',
     bg: '#f59e0b',
+    status: 'READY_TO_COMPLETE',
   },
   {
     label: 'Ready to Invoice',
     value: stats.value?.readyToInvoice ?? 0,
     icon: 'pi-file-edit',
     bg: '#6366f1',
+    status: 'READY_TO_INVOICE',
   },
   {
     label: 'Invoiced Today',
     value: stats.value?.invoicedToday ?? 0,
     icon: 'pi-check-circle',
     bg: '#22c55e',
+    status: 'INVOICED',
   },
   {
     label: 'Invoice Errors',
     value: stats.value?.invoiceErrors ?? 0,
     icon: 'pi-times-circle',
     bg: '#ef4444',
+    status: 'INVOICE_ERROR',
   },
 ])
 </script>

@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Tag from 'primevue/tag'
@@ -78,9 +78,10 @@ import { reservationsService } from '../services/reservations'
 import type { Reservation, ReservationStatus } from '../types/reservation'
 
 const router = useRouter()
+const route = useRoute()
 const reservations = ref<Reservation[]>([])
 const loading = ref(true)
-const statusFilter = ref<ReservationStatus | null>(null)
+const statusFilter = ref<ReservationStatus | null>((route.query.status as ReservationStatus) ?? null)
 
 onMounted(async () => {
   try {
