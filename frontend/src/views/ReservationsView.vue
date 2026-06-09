@@ -24,6 +24,8 @@
       paginator
       :rows="20"
       :rows-per-page-options="[10, 20, 50]"
+      scrollable
+      scroll-height="flex"
     >
       <template #empty>No reservations found.</template>
 
