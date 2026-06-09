@@ -6,6 +6,14 @@
     </div>
 
     <div class="filter-bar">
+      <Button
+        v-if="route.query.status"
+        icon="pi pi-arrow-left"
+        label="Dashboard"
+        severity="secondary"
+        size="small"
+        @click="router.push('/')"
+      />
       <Select
         v-model="statusFilter"
         :options="statusOptions"
