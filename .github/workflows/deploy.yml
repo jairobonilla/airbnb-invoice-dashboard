@@ -36,4 +36,4 @@ jobs:
           image: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_AR_REPOSITORY }}/airbnb-invoice-dashboard:${{ github.sha }}
           env_vars: DATABASE_URL=${{ secrets.DATABASE_URL }}
           cloudsql_instances: ${{ secrets.GCP_PROJECT_ID }}:${{ secrets.GCP_REGION }}:${{ secrets.CLOUD_SQL_INSTANCE }}
-          flags: --allow-unauthenticated
+          flags: --allow-unauthenticated --min-instances=0 --max-instances=2 --memory=512Mi --cpu=1
